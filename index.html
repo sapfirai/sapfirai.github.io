@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>САПФИР</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M16 6h32l14 18-30 36L2 24z' fill='%232447A8'/%3E%3Cpath d='M2 24h60L32 60z' fill='%23142B6B'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     НАСТРОЙКИ — всё, что нужно менять, находится в <script> ниже:
+     PASSWORD_HASH и массив SECTIONS.
+     ========================================================= */
+  :root {
+    --bg: #EEF2F8;
+    --surface: #FFFFFF;
+    --ink: #0E1A3A;
+    --muted: #56617E;
+    --line: #D3DAE8;
+    --sapphire: #2447A8;
+    --sapphire-deep: #142B6B;
+    --facet: #6F8FE0;
+    --error: #B42318;
+    --display: "Unbounded", "Segoe UI", Arial, sans-serif;
+    --text: "Onest", "Segoe UI", Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0A1230;
+      --surface: #111C44;
+      --ink: #E7ECFA;
+      --muted: #9AA6C8;
+      --line: #25336A;
+      --sapphire: #7C9BF0;
+      --sapphire-deep: #3656B8;
+      --facet: #A9BDF5;
+      --error: #FF8A80;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--text);
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--facet); outline-offset: 3px; border-radius: 4px; }
+  [hidden] { display: none !important; }
+
+  /* ---------- Экран входа ---------- */
+  .gate {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .gate-brand {
+    background: var(--sapphire-deep);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(28px, 5vw, 64px);
+    position: relative;
+    overflow: hidden;
+  }
+  .gem {
+    width: min(78%, 420px);
+    align-self: center;
+    margin: 32px 0;
+  }
+  .gem path { transition: opacity .6s ease; }
+  .wordmark {
+    font-family: var(--display);
+    font-weight: 600;
+    font-size: clamp(40px, 6vw, 76px);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin: 0;
+  }
+  .brand-note { margin: 12px 0 0; color: #C6D2F3; max-width: 34ch; }
+
+  .gate-form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(28px, 5vw, 64px);
+  }
+  form { width: 100%; max-width: 380px; }
+  form h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: 28px;
+    line-height: 1.2;
+    margin: 0 0 8px;
+  }
+  form p { margin: 0 0 28px; color: var(--muted); }
+  label { display: block; font-weight: 500; margin-bottom: 8px; }
+  .field { position: relative; }
+  input[type="password"], input[type="text"] {
+    width: 100%;
+    font: inherit;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1.5px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 92px 14px 16px;
+  }
+  input:focus { outline: none; border-color: var(--sapphire); }
+  input[aria-invalid="true"] { border-color: var(--error); }
+  .toggle {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    font: inherit; font-size: 14px; color: var(--muted);
+    background: none; border: 0; padding: 6px 8px; cursor: pointer;
+  }
+  .remember { display: flex; gap: 10px; align-items: center; margin: 16px 0 24px; font-weight: 400; color: var(--muted); }
+  .remember input { width: 18px; height: 18px; accent-color: var(--sapphire); margin: 0; }
+  .error { color: var(--error); font-size: 15px; margin: 10px 0 0; min-height: 1.5em; }
+  .btn {
+    width: 100%;
+    font: inherit; font-weight: 600;
+    color: #fff;
+    background: var(--sapphire);
+    border: 0; border-radius: 10px;
+    padding: 14px 20px;
+    cursor: pointer;
+  }
+  @media (prefers-color-scheme: dark) { .btn { color: #0A1230; } }
+  .btn:hover { filter: brightness(1.08); }
+
+  /* ---------- Меню ---------- */
+  .hub { max-width: 980px; margin: 0 auto; padding: clamp(24px, 5vw, 56px) clamp(20px, 5vw, 48px) 64px; }
+  .hub-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: clamp(40px, 8vw, 88px); }
+  .hub-logo { display: flex; align-items: center; gap: 12px; font-family: var(--display); font-weight: 600; font-size: 22px; letter-spacing: 0.02em; }
+  .hub-logo svg { width: 34px; height: 34px; }
+  .logout { font: inherit; font-size: 15px; color: var(--muted); background: none; border: 1.5px solid var(--line); border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+  .logout:hover { color: var(--ink); border-color: var(--muted); }
+  .hub h1 {
+    font-family: var(--display);
+    font-weight: 400;
+    font-size: clamp(30px, 4.6vw, 48px);
+    line-height: 1.15;
+    margin: 0 0 12px;
+    max-width: 20ch;
+  }
+  .hub-lead { color: var(--muted); margin: 0 0 48px; max-width: 60ch; }
+
+  .sections { list-style: none; margin: 0; padding: 0; border-top: 1.5px solid var(--ink); }
+  .sections li { border-bottom: 1px solid var(--line); }
+  .row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 24px;
+    align-items: center;
+    padding: 26px 4px;
+    text-decoration: none;
+  }
+  .row-title { font-family: var(--display); font-weight: 400; font-size: clamp(20px, 2.6vw, 28px); line-height: 1.2; }
+  .row-desc { grid-column: 1; color: var(--muted); margin: 0; max-width: 60ch; }
+  .row-status { grid-column: 2; grid-row: 1 / span 2; font-weight: 600; font-size: 15px; white-space: nowrap; }
+  a.row .row-status { color: var(--sapphire); }
+  a.row:hover .row-title { color: var(--sapphire); }
+  a.row .row-status svg { width: 16px; height: 16px; vertical-align: -2px; margin-left: 6px; transition: transform .2s ease; }
+  a.row:hover .row-status svg { transform: translate(3px, -3px); }
+  .row.is-soon { color: var(--muted); }
+  .row.is-soon .row-status { color: var(--muted); font-weight: 500; border: 1px dashed var(--line); border-radius: 999px; padding: 4px 12px; }
+
+  .hub-foot { margin-top: 48px; color: var(--muted); font-size: 14px; }
+
+  @media (max-width: 760px) {
+    .gate { grid-template-columns: 1fr; }
+    .gate-brand { min-height: auto; }
+    .gem { width: 150px; margin: 20px 0; }
+    .row { grid-template-columns: 1fr; }
+    .row-status { grid-column: 1; grid-row: auto; justify-self: start; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= ЭКРАН ВХОДА ================= -->
+<main class="gate" id="gate">
+  <section class="gate-brand" aria-hidden="true">
+    <div>
+      <p class="wordmark">САПФИР</p>
+      <p class="brand-note">Аналитика и исследования в области искусственного интеллекта</p>
+    </div>
+    <svg class="gem" viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+      <!-- корона -->
+      <path d="M100 20h200l-40 80H140z" fill="#3E63C9"/>
+      <path d="M100 20l40 80H20z" fill="#2B4FAE"/>
+      <path d="M300 20l-40 80h120z" fill="#5277DA"/>
+      <path d="M140 100h120L200 20z" fill="#6F8FE0" opacity=".55"/>
+      <!-- павильон -->
+      <path d="M20 100h120l60 250z" fill="#1D3C92"/>
+      <path d="M140 100h120l-60 250z" fill="#2D55C0"/>
+      <path d="M260 100h120L200 350z" fill="#18357F"/>
+      <path d="M140 100l60 250-110-160z" fill="#A9BDF5" opacity=".18"/>
+      <path d="M100 20h200" stroke="#C9D6FA" stroke-width="2" opacity=".6"/>
+    </svg>
+  </section>
+
+  <section class="gate-form">
+    <form id="login" novalidate>
+      <h1>Вход</h1>
+      <p>Доступ к материалам открыт по паролю.</p>
+      <label for="pwd">Пароль</label>
+      <div class="field">
+        <input id="pwd" type="password" autocomplete="current-password" required aria-describedby="err">
+        <button type="button" class="toggle" id="toggle" aria-controls="pwd">Показать</button>
+      </div>
+      <p class="error" id="err" role="alert"></p>
+      <label class="remember"><input type="checkbox" id="remember"> Запомнить на этом устройстве</label>
+      <button class="btn" type="submit">Войти</button>
+    </form>
+  </section>
+</main>
+
+<!-- ================= МЕНЮ ================= -->
+<div class="hub" id="hub" hidden>
+  <header class="hub-top">
+    <div class="hub-logo">
+      <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 6h32l14 18-30 36L2 24z" fill="#2447A8"/><path d="M2 24h60L32 60z" fill="#142B6B"/></svg>
+      САПФИР
+    </div>
+    <button class="logout" id="logout" type="button">Выйти</button>
+  </header>
+
+  <main>
+    <h1>Материалы проекта</h1>
+    <p class="hub-lead">Выберите раздел. Новые материалы появятся в этом списке по мере публикации.</p>
+    <ul class="sections" id="sections"></ul>
+  </main>
+
+  <footer class="hub-foot">© САПФИР, sapfirai.ru</footer>
+</div>
+
+<script>
+/* =========================================================
+   1) ПАРОЛЬ
+   Здесь хранится не сам пароль, а его SHA-256 хэш.
+   Текущий пароль: sapfir2026  — обязательно смените.
+   Как получить хэш нового пароля: откройте консоль браузера (F12)
+   на любой https-странице и выполните:
+     crypto.subtle.digest('SHA-256', new TextEncoder().encode('НОВЫЙ_ПАРОЛЬ'))
+       .then(b => console.log([...new Uint8Array(b)].map(x => x.toString(16).padStart(2,'0')).join('')))
+   ========================================================= */
+const PASSWORD_HASH = "42ee7c6a4386fc98b9bd2858c175588695b23edfc95cd515aa5d241c64136dc0";
+
+/* =========================================================
+   2) РАЗДЕЛЫ МЕНЮ
+   url: ссылка на страницу/поддомен. null — раздел помечается «Скоро».
+   ========================================================= */
+const SECTIONS = [
+  {
+    title: "Пульс ИИ",
+    desc: "Дашборд: регулярно обновляемые показатели ИИ-науки в России и странах сравнения.",
+    url: "https://stepkhop.github.io/pulsai_2/"   // позже: "/dashboard-ai/"
+  },
+  {
+    title: "Отчет А*",
+    desc: "Аналитический отчет.",
+    url: null
+  },
+  {
+    title: "Витрина решений ИЦ",
+    desc: "Решения, разработанные исследовательским центром.",
+    url: null
+  },
+  {
+    title: "Стандарты качества исследований в ИИ",
+    desc: "Требования и рекомендации к проведению исследований в области ИИ.",
+    url: null
+  }
+];
+
+/* ================= дальше менять не нужно ================= */
+const KEY = "sapfir_auth";
+
+function render() {
+  const list = document.getElementById("sections");
+  list.innerHTML = "";
+  const arrow = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12L12 4M6 4h6v6"/></svg>';
+  for (const s of SECTIONS) {
+    const li = document.createElement("li");
+    const el = document.createElement(s.url ? "a" : "div");
+    el.className = "row" + (s.url ? "" : " is-soon");
+    if (s.url) el.href = s.url;
+    el.innerHTML =
+      '<span class="row-title"></span><p class="row-desc"></p>' +
+      '<span class="row-status">' + (s.url ? "Открыть" + arrow : "Скоро") + '</span>';
+    el.querySelector(".row-title").textContent = s.title;
+    el.querySelector(".row-desc").textContent = s.desc;
+    li.appendChild(el);
+    list.appendChild(li);
+  }
+}
+
+function showHub() {
+  document.getElementById("gate").hidden = true;
+  document.getElementById("hub").hidden = false;
+  render();
+}
+function showGate() {
+  document.getElementById("hub").hidden = true;
+  document.getElementById("gate").hidden = false;
+  document.getElementById("pwd").focus();
+}
+
+function store(where, value) {
+  try { where === "local" ? localStorage.setItem(KEY, value) : sessionStorage.setItem(KEY, value); } catch (e) {}
+}
+function isAuthed() {
+  try {
+    return localStorage.getItem(KEY) === PASSWORD_HASH || sessionStorage.getItem(KEY) === PASSWORD_HASH;
+  } catch (e) { return false; }
+}
+function clearAuth() {
+  try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch (e) {}
+}
+
+/* SHA-256: встроенный в браузер, с запасной реализацией на случай открытия файла без https */
+async function sha256(text) {
+  if (window.crypto && crypto.subtle) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+  return sha256Fallback(text);
+}
+function sha256Fallback(ascii) {
+  const bytes = new TextEncoder().encode(ascii);
+  const K = [], H = [];
+  let n = 2, found = 0;
+  const frac = x => ((x - Math.floor(x)) * 4294967296) | 0;
+  outer: while (found < 64) {
+    for (let f = 2; f * f <= n; f++) if (n % f === 0) { n++; continue outer; }
+    if (found < 8) H[found] = frac(Math.pow(n, 1 / 2));
+    K[found++] = frac(Math.pow(n, 1 / 3));
+    n++;
+  }
+  const len = bytes.length, total = ((len + 9 + 63) >> 6) << 6;
+  const m = new Uint8Array(total); m.set(bytes); m[len] = 0x80;
+  const bits = len * 8;
+  m[total - 4] = bits >>> 24; m[total - 3] = bits >>> 16; m[total - 2] = bits >>> 8; m[total - 1] = bits;
+  const w = new Int32Array(64), rot = (v, c) => (v >>> c) | (v << (32 - c));
+  for (let i = 0; i < total; i += 64) {
+    for (let j = 0; j < 16; j++) w[j] = (m[i+j*4] << 24) | (m[i+j*4+1] << 16) | (m[i+j*4+2] << 8) | m[i+j*4+3];
+    for (let j = 16; j < 64; j++) {
+      const s0 = rot(w[j-15], 7) ^ rot(w[j-15], 18) ^ (w[j-15] >>> 3);
+      const s1 = rot(w[j-2], 17) ^ rot(w[j-2], 19) ^ (w[j-2] >>> 10);
+      w[j] = (w[j-16] + s0 + w[j-7] + s1) | 0;
+    }
+    let [a, b, c, d, e, f, g, h] = H;
+    for (let j = 0; j < 64; j++) {
+      const t1 = (h + (rot(e, 6) ^ rot(e, 11) ^ rot(e, 25)) + ((e & f) ^ (~e & g)) + K[j] + w[j]) | 0;
+      const t2 = ((rot(a, 2) ^ rot(a, 13) ^ rot(a, 22)) + ((a & b) ^ (a & c) ^ (b & c))) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = b; b = a; a = (t1 + t2) | 0;
+    }
+    H[0]=(H[0]+a)|0; H[1]=(H[1]+b)|0; H[2]=(H[2]+c)|0; H[3]=(H[3]+d)|0;
+    H[4]=(H[4]+e)|0; H[5]=(H[5]+f)|0; H[6]=(H[6]+g)|0; H[7]=(H[7]+h)|0;
+  }
+  return H.map(x => (x >>> 0).toString(16).padStart(8, "0")).join("");
+}
+
+document.getElementById("toggle").addEventListener("click", e => {
+  const input = document.getElementById("pwd");
+  const show = input.type === "password";
+  input.type = show ? "text" : "password";
+  e.currentTarget.textContent = show ? "Скрыть" : "Показать";
+});
+
+document.getElementById("login").addEventListener("submit", async e => {
+  e.preventDefault();
+  const input = document.getElementById("pwd");
+  const err = document.getElementById("err");
+  if (!input.value) {
+    err.textContent = "Введите пароль.";
+    input.setAttribute("aria-invalid", "true");
+    return;
+  }
+  const hash = await sha256(input.value);
+  if (hash === PASSWORD_HASH) {
+    store(document.getElementById("remember").checked ? "local" : "session", hash);
+    input.value = "";
+    err.textContent = "";
+    input.removeAttribute("aria-invalid");
+    showHub();
+  } else {
+    err.textContent = "Неверный пароль. Проверьте раскладку и Caps Lock.";
+    input.setAttribute("aria-invalid", "true");
+    input.select();
+  }
+});
+
+document.getElementById("pwd").addEventListener("input", () => {
+  document.getElementById("pwd").removeAttribute("aria-invalid");
+  document.getElementById("err").textContent = "";
+});
+
+document.getElementById("logout").addEventListener("click", () => { clearAuth(); showGate(); });
+
+isAuthed() ? showHub() : showGate();
+</script>
+</body>
+</html>
